@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class OpenAddressingSet<T> extends AbstractSet<T> {
@@ -54,17 +55,18 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
 
     /**
      * Добавление элемента в таблицу.
-     *
+     * <p>
      * Не делает ничего и возвращает false, если такой же элемент уже есть в таблице.
      * В противном случае вставляет элемент в таблицу и возвращает true.
-     *
+     * <p>
      * Бросает исключение (IllegalStateException) в случае переполнения таблицы.
      * Обычно Set не предполагает ограничения на размер и подобных контрактов,
      * но в данном случае это было введено для упрощения кода.
      */
-    private enum Removed{
+    private enum Removed {
         REMOVED
     }
+
     @Override
     public boolean add(T t) {
         int startingIndex = startingIndex(t);
@@ -87,13 +89,13 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
 
     /**
      * Удаление элемента из таблицы
-     *
+     * <p>
      * Если элемент есть в таблица, функция удаляет его из дерева и возвращает true.
      * В ином случае функция оставляет множество нетронутым и возвращает false.
      * Высота дерева не должна увеличиться в результате удаления.
-     *
+     * <p>
      * Спецификация: {@link Set#remove(Object)} (Ctrl+Click по remove)
-     *
+     * <p>
      * Средняя
      */
 
@@ -103,9 +105,9 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
     @Override
     public boolean remove(Object o) {
         int currentIndex = startingIndex(o);
-        Object object =  storage[currentIndex];
-        while (object != null && object != Removed.REMOVED){
-            if (object.equals(o)){
+        Object object = storage[currentIndex];
+        while (object != null && object != Removed.REMOVED) {
+            if (object.equals(o)) {
                 storage[currentIndex] = Removed.REMOVED;
                 size--;
                 return true;
@@ -118,18 +120,65 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
 
     /**
      * Создание итератора для обхода таблицы
-     *
+     * <p>
      * Не забываем, что итератор должен поддерживать функции next(), hasNext(),
      * и опционально функцию remove()
-     *
+     * <p>
      * Спецификация: {@link Iterator} (Ctrl+Click по Iterator)
-     *
+     * <p>
      * Средняя (сложная, если поддержан и remove тоже)
      */
     @NotNull
     @Override
+    /* next
+    время O(n)
+    ресурсы O(1)
+
+
+    hasNext
+    время O(1)
+    память O(1)
+
+    remove
+    время O(1)
+    память O(1)
+    */
     public Iterator<T> iterator() {
-        // TODO
-        throw new NotImplementedError();
+        return new IteratorForOAS();
     }
+
+    public class IteratorForOAS implements Iterator<T> {
+        int currentIndex = 0;
+        int countOfObj = 0;
+
+
+        @Override
+        public T next() {
+            if (hasNext()) {
+                while (storage[currentIndex] == null || storage[currentIndex] == Removed.REMOVED)
+                    currentIndex++;
+            } else
+                throw new IllegalStateException();
+
+            countOfObj++;
+            currentIndex++;
+
+            return (T) storage[currentIndex - 1];
+        }
+
+        @Override
+        public boolean hasNext() {
+            return countOfObj < size;
+        }
+
+        @Override
+        public void remove() {
+            if (currentIndex == 0)
+                throw new IllegalStateException();
+            storage[currentIndex-1] = Removed.REMOVED;
+            countOfObj--;
+            size--;
+        }
+    }
+
 }

@@ -76,10 +76,12 @@ abstract class AbstractOpenAddressingSetTest {
                 )
             }
         }
+
         val setForMyTest = mutableSetOf<Int>()
         val caseToRemove = 54;
         setForMyTest.add(caseToRemove);
-        assertTrue { setForMyTest.remove(caseToRemove) }
+        setForMyTest.remove(caseToRemove)
+        assertTrue(setForMyTest.isEmpty())
     }
 
     protected fun doIteratorTest() {
