@@ -62,12 +62,15 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      * Обычно Set не предполагает ограничения на размер и подобных контрактов,
      * но в данном случае это было введено для упрощения кода.
      */
+    private enum Removed{
+        REMOVED
+    }
     @Override
     public boolean add(T t) {
         int startingIndex = startingIndex(t);
         int index = startingIndex;
         Object current = storage[index];
-        while (current != null) {
+        while (current != null && current != Removed.REMOVED) {
             if (current.equals(t)) {
                 return false;
             }
@@ -93,9 +96,24 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      *
      * Средняя
      */
+
+
+    // время - O(n);
+    // ресурсы - O(1);
     @Override
     public boolean remove(Object o) {
-        return super.remove(o);
+        int currentIndex = startingIndex(o);
+        Object object =  storage[currentIndex];
+        while (object != null && object != Removed.REMOVED){
+            if (object.equals(o)){
+                storage[currentIndex] = Removed.REMOVED;
+                size--;
+                return true;
+            }
+            currentIndex = (currentIndex + 1) % capacity;
+            object = storage[currentIndex];
+        }
+        return false;
     }
 
     /**
