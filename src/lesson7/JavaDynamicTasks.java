@@ -65,8 +65,11 @@ public class JavaDynamicTasks {
      * то вернуть ту, в которой числа расположены раньше (приоритет имеют первые числа).
      * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
      */
-    public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
+    //время O(n^2)
+    //ресурсы O(n)
+    // n - list.size
 
+    public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
         if (list.size() <= 1)
             return list;
 
