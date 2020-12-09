@@ -94,6 +94,9 @@ public class JavaGraphTasks {
      * <p>
      * Эта задача может быть зачтена за пятый и шестой урок одновременно
      */
+
+    //время O(кол-во вершин^2)
+    // ресурсы O(n)
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
         boolean cycled = false;
         Set<Graph.Vertex> biggestIndependent = graph.getVertices();
