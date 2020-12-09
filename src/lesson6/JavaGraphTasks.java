@@ -2,10 +2,7 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class JavaGraphTasks {
@@ -98,7 +95,31 @@ public class JavaGraphTasks {
      * Эта задача может быть зачтена за пятый и шестой урок одновременно
      */
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
-        throw new NotImplementedError();
+        boolean cycled = false;
+        Set<Graph.Vertex> biggestIndependent = graph.getVertices();
+        Set<Graph.Vertex> cycleCheck = new HashSet<>();
+        Set<Graph.Vertex> used = graph.getVertices();
+        Set<Graph.Vertex> useless;
+
+        for (Graph.Vertex v : graph.getVertices()) {
+            if (graph.getNeighbors(v).size() < 2) continue;
+            if (cycleCheck.containsAll(graph.getNeighbors(v)))
+                cycled = true;
+            else cycleCheck.add(v);
+        }
+
+
+        if (!cycled) {
+            for (Graph.Vertex vertex : graph.getVertices()) {
+                if (used.contains(vertex)) {
+                    useless = graph.getNeighbors(vertex);
+                    for (Graph.Vertex neighbors : useless)
+                        used.remove(neighbors);
+                }
+            }
+        } else throw new IllegalArgumentException();
+        return used;
+
     }
 
     /**
@@ -122,7 +143,8 @@ public class JavaGraphTasks {
      * Ответ: A, E, J, K, D, C, H, G, B, F, I
      */
 
-    // время O(вершины + ребра)
+    // время O(вершины^2)
+    // ресурсы O(вершины)
     public static Path longestSimplePath(Graph graph) {
 
         Path longest = new Path();
@@ -131,7 +153,7 @@ public class JavaGraphTasks {
         for (Graph.Vertex vertex : graph.getVertices())
             allPaths.push(new Path(vertex));
 
-        while (allPaths.size() > 0){
+        while (allPaths.size() > 0) {
             Path curPath = allPaths.pop();
             if (longest.getLength() < curPath.getLength())
                 longest = curPath;
@@ -142,9 +164,8 @@ public class JavaGraphTasks {
                     allPaths.push(new Path(curPath, graph, v));
         }
 
-    return longest;
+        return longest;
     }
-
 
 
     /**
