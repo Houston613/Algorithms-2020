@@ -123,7 +123,6 @@ public class JavaGraphTasks {
      */
 
     // время O(вершины + ребра)
-
     public static Path longestSimplePath(Graph graph) {
 
         Path longest = new Path();
